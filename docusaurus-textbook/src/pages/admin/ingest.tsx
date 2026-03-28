@@ -49,13 +49,13 @@ export default function AdminIngestPage() {
             <div className="row">
               <div className="col col--6">
                 <a
-                  href="/admin/ingest"
+                  href="/physical-ai-humanoid-robotics-textbook/admin/ingest"
                   className="button button--primary button--lg margin-right--md"
                 >
                   📤 Knowledge Base
                 </a>
                 <a
-                  href="/admin/status"
+                  href="/physical-ai-humanoid-robotics-textbook/admin/status"
                   className="button button--secondary button--lg"
                 >
                   🛡️ System Status
