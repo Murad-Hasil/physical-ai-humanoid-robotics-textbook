@@ -780,3 +780,22 @@ html, body {
 .footer {
   display: none;
 }
+
+/* ============================================
+   RESPONSIVE NAVBAR — desktop/mobile helpers
+   ============================================ */
+
+/* Hide desktop nav links + auth items on mobile */
+@media screen and (max-width: 996px) {
+  .desktop-nav-link,
+  .desktop-auth-items {
+    display: none !important;
+  }
+}
+
+/* Hide hamburger on desktop */
+@media screen and (min-width: 997px) {
+  .navbar__toggle {
+    display: none !important;
+  }
+}
