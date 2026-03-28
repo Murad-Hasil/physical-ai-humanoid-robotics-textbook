@@ -94,7 +94,7 @@ export default function CyberFooter() {
                 style={{ color: '#00F3FF', fontSize: '1.5rem', textDecoration: 'none' }}
               >🐙</a>
               <a
-                href="https://www.linkedin.com/in/murad-hasil"
+                href="https://www.linkedin.com/in/muradhasil/"
                 target="_blank"
                 rel="noopener noreferrer"
                 title="LinkedIn"
