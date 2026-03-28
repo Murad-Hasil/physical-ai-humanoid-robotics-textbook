@@ -18,23 +18,16 @@ export default function AdminIngestPage() {
   /**
    * Handle upload complete
    */
-  const handleUploadComplete = (result: any) => {
+  const handleUploadComplete = (_result: any) => {
     setUploadCount((prev) => prev + 1);
-    console.log('Upload complete:', result);
   };
 
-  /**
-   * Handle upload error
-   */
-  const handleUploadError = (error: Error) => {
-    console.error('Upload error:', error);
+  const handleUploadError = (_error: Error) => {
+    // error displayed in FileUploader UI
   };
 
-  /**
-   * Handle file deleted
-   */
-  const handleFileDeleted = (fileId: string) => {
-    console.log('File deleted:', fileId);
+  const handleFileDeleted = (_fileId: string) => {
+    // table refreshes automatically
   };
 
   return (

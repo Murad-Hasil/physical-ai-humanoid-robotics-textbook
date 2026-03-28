@@ -85,11 +85,21 @@ export default function CyberFooter() {
             <h4 style={{ color: '#00F3FF', marginBottom: '1rem', fontSize: '1.1rem' }}>
               Connect
             </h4>
-            <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
-              <a href="https://github.com" target="_blank" rel="noopener noreferrer" style={{ color: '#00F3FF', fontSize: '1.5rem', textDecoration: 'none' }}>🐙</a>
-              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" style={{ color: '#00F3FF', fontSize: '1.5rem', textDecoration: 'none' }}>💼</a>
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" style={{ color: '#00F3FF', fontSize: '1.5rem', textDecoration: 'none' }}>🐦</a>
-              <a href="https://discord.com" target="_blank" rel="noopener noreferrer" style={{ color: '#00F3FF', fontSize: '1.5rem', textDecoration: 'none' }}>🎮</a>
+            <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+              <a
+                href="https://github.com/Murad-Hasil/physical-ai-humanoid-robotics-textbook"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="GitHub Repository"
+                style={{ color: '#00F3FF', fontSize: '1.5rem', textDecoration: 'none' }}
+              >🐙</a>
+              <a
+                href="https://www.linkedin.com/in/murad-hasil"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="LinkedIn"
+                style={{ color: '#00F3FF', fontSize: '1.5rem', textDecoration: 'none' }}
+              >💼</a>
             </div>
             
             {/* Watermark */}

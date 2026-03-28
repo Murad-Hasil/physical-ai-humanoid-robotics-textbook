@@ -15,9 +15,9 @@ interface TranslationProgressProps {
 
 const statusConfig: Record<TranslationStatus, { color: string; icon: string; label: string }> = {
   draft: {
-    color: 'text-[#FFD700]',
-    icon: '🔄',
-    label: 'AI Translation in progress',
+    color: 'text-[#A0A0B0]',
+    icon: '📝',
+    label: 'Roman Urdu translation not yet available for this chapter',
   },
   in_review: {
     color: 'text-[#FF6B35]',

@@ -53,9 +53,9 @@ export const TranslationToggle: React.FC<TranslationToggleProps> = ({
         )}
       </button>
 
-      {!translationAvailable && (
-        <span className="text-xs text-[#FFD700] translation-in-progress">
-          AI Translation in progress
+      {!translationAvailable && currentLang === 'ur-Latn' && (
+        <span className="text-xs text-[#A0A0B0]">
+          Not available for this chapter
         </span>
       )}
     </div>

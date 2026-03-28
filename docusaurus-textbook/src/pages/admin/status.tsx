@@ -189,7 +189,7 @@ export default function AdminSystemStatusPage() {
       }
 
       const data = await response.json();
-      console.log('Re-indexing started:', data);
+      // re-index job started, polling begins
       
       // Start polling for status
       const pollInterval = setInterval(fetchReindexStatus, 5000);

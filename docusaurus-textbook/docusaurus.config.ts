@@ -25,7 +25,7 @@ const config: Config = {
   onBrokenLinks: 'warn',
 
   customFields: {
-    apiUrl: process.env.API_URL || 'http://localhost:8000',
+    apiUrl: process.env.API_URL || 'https://mb-murad-physical-ai-backend.hf.space',
   },
 
   // Even if you don't use internationalization, you can use this field to set
