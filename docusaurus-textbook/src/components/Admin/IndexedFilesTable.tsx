@@ -7,10 +7,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@site/src/hooks/useAuth';
 
-// API base URL — SSR-safe: window not available during static generation
-const API_BASE_URL = process.env.NODE_ENV === 'production'
-  ? (typeof window !== 'undefined' ? window.location.origin : '')
-  : 'https://mb-murad-physical-ai-backend.hf.space';
+const API_BASE_URL = 'https://mb-murad-physical-ai-backend.hf.space';
 
 interface IndexedFile {
   id: string;

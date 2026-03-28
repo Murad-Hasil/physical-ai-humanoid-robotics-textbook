@@ -140,7 +140,7 @@ export default function AdminSystemStatusPage() {
   const fetchReindexStatus = async () => {
     try {
       const token = localStorage.getItem('access_token');
-      const response = await fetch(`${API_URL}/api/admin/reindex/status`, {
+      const response = await fetch(`${API_URL}/api/admin/ingest/reindex/status`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
