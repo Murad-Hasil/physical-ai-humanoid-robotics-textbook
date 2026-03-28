@@ -84,7 +84,7 @@ export default function AdminSystemStatusPage() {
   const [error, setError] = useState<string | null>(null);
 
   // API base URL — Docusaurus uses Webpack, not Vite; env vars not polyfilled at runtime
-  const API_URL = 'http://localhost:8000';
+  const API_URL = 'https://mb-murad-physical-ai-backend.hf.space';
 
   /**
    * Fetch health data

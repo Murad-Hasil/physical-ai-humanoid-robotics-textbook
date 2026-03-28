@@ -9,7 +9,7 @@ import React, { useState, useEffect, createContext, useContext } from 'react';
 // Use environment variable for API URL with fallback
 // Webpack 5 does not polyfill process. Docusaurus injects env vars only at compile-time.
 // For runtime config, use docusaurus.config.ts customFields + useDocusaurusContext().
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = 'https://mb-murad-physical-ai-backend.hf.space';
 
 // TypeScript interfaces
 interface User {

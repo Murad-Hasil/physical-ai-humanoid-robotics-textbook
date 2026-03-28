@@ -37,7 +37,7 @@ jobs:
       - name: Build website
         run: npm run build
         env:
-          API_URL: https://your-backend-url.com
+          API_URL: https://mb-murad-physical-ai-backend.hf.space
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4

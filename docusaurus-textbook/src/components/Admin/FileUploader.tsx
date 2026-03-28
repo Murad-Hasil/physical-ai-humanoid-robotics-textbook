@@ -11,7 +11,7 @@ import { useAuth } from '@site/src/hooks/useAuth';
 // API base URL — SSR-safe: window not available during static generation
 const API_BASE_URL = process.env.NODE_ENV === 'production'
   ? (typeof window !== 'undefined' ? window.location.origin : '')
-  : 'http://localhost:8000';
+  : 'https://mb-murad-physical-ai-backend.hf.space';
 
 /**
  * FileUploader component props

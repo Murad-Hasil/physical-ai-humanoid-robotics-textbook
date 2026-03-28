@@ -59,7 +59,7 @@ interface PersonalizationContextType {
 
 const PersonalizationContext = createContext<PersonalizationContextType | undefined>(undefined);
 
-const API_BASE_URL = 'http://localhost:8000/api/v1';
+const API_BASE_URL = 'https://mb-murad-physical-ai-backend.hf.space/api/v1';
 
 export function PersonalizationProvider({ children }: { children: ReactNode }) {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);

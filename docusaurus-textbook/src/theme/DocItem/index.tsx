@@ -17,7 +17,7 @@ import HardwareIndicator from '@site/src/components/personalization/HardwareIndi
 import PersonalizationToggle from '@site/src/components/personalization/PersonalizationToggle';
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8000/api/v1';
+const API_BASE_URL = 'https://mb-murad-physical-ai-backend.hf.space/api/v1';
 
 export default function DocItem(props: any) {
   const {

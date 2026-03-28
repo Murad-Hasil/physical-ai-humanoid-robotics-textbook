@@ -9,7 +9,7 @@ import { useAuth } from '../hooks/useAuth';
 import axios from 'axios';
 
 // Webpack 5 does not polyfill process. Using hardcoded dev URL.
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = 'https://mb-murad-physical-ai-backend.hf.space';
 
 // Hardware Context
 const HardwareContext = createContext(null);

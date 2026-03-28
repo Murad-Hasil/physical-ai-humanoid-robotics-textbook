@@ -13,7 +13,7 @@ import { useAuth } from '@site/src/hooks/useAuth';
 import { SkillLevelSelector } from '@site/src/components/onboarding/SkillLevelSelector';
 import HardwareProfileForm from '@site/src/components/onboarding/HardwareProfileForm';
 
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = 'https://mb-murad-physical-ai-backend.hf.space';
 
 export default function Signup() {
   const { register, error: authError } = useAuth();
