@@ -49,9 +49,6 @@ export default function CyberFooter() {
               <li style={{ marginBottom: '0.75rem' }}>
                 <a href="/physical-ai-humanoid-robotics-textbook/profile" style={{ color: '#E0E0E0', textDecoration: 'none' }}>🖥️ Dashboard</a>
               </li>
-              <li style={{ marginBottom: '0.75rem' }}>
-                <a href="/physical-ai-humanoid-robotics-textbook/admin/ingest" style={{ color: '#E0E0E0', textDecoration: 'none' }}>🛡️ Admin</a>
-              </li>
             </ul>
           </div>
 

@@ -1,0 +1,23 @@
+name: Keep HF Space Alive
+
+on:
+  schedule:
+    # Every 8 minutes — HF free tier sleeps after ~15 min inactivity
+    - cron: '*/8 * * * *'
+  workflow_dispatch: # allow manual trigger
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping backend health endpoint
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            --max-time 30 \
+            https://mb-murad-physical-ai-backend.hf.space/health)
+          echo "Health endpoint responded: $STATUS"
+          if [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 500 ]; then
+            echo "Backend is awake."
+          else
+            echo "Warning: unexpected status $STATUS"
+          fi
