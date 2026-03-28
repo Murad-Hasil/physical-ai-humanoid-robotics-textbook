@@ -39,7 +39,7 @@ python-multipart>=0.0.6
 PyJWT>=2.8.0
 sqlalchemy>=2.0.0
 alembic>=1.13.0
-bcrypt>=4.1.0
+bcrypt==4.0.1
 python-jose[cryptography]>=3.3.0
 passlib>=1.7.4
 email-validator>=2.1.0  # For email validation

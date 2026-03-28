@@ -106,12 +106,14 @@ async def root():
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
     """Handle unhandled exceptions."""
-    logger.exception(f"Unhandled exception: {exc}")
+    exc_type = type(exc).__name__
+    logger.exception(f"Unhandled exception [{exc_type}]: {exc}")
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={
             "error": "internal_error",
             "message": "An unexpected error occurred.",
+            "error_type": exc_type,
         },
     )
 

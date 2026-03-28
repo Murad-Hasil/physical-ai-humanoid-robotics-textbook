@@ -45,7 +45,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       // Token expired or invalid - clear storage and redirect
       localStorage.removeItem('access_token');
-      window.location.href = '/';
+      window.location.href = '/physical-ai-humanoid-robotics-textbook/';
     }
     return Promise.reject(error);
   }

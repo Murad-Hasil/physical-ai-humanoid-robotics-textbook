@@ -34,7 +34,7 @@ export default function Login() {
     try {
       await login(formData.email, formData.password);
       // Redirect to profile page
-      window.location.href = '/profile';
+      window.location.href = '/physical-ai-humanoid-robotics-textbook/profile';
     } catch (err) {
       setError(err.message || 'Login failed. Please check your credentials.');
     } finally {
@@ -176,7 +176,7 @@ export default function Login() {
                 <div className="text--center margin-top--lg">
                   <p className="text--muted">
                     Don't have an account?{' '}
-                    <a href="/signup" className="neon-link">
+                    <a href="/physical-ai-humanoid-robotics-textbook/signup" className="neon-link">
                       Create one
                     </a>
                   </p>

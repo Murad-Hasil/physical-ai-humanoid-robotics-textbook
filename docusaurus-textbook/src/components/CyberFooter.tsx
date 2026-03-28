@@ -41,16 +41,16 @@ export default function CyberFooter() {
             </h4>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
               <li style={{ marginBottom: '0.75rem' }}>
-                <a href="/docs/introduction-to-physical-ai" style={{ color: '#E0E0E0', textDecoration: 'none' }}>📚 Documentation</a>
+                <a href="/physical-ai-humanoid-robotics-textbook/docs/introduction-to-physical-ai" style={{ color: '#E0E0E0', textDecoration: 'none' }}>📚 Documentation</a>
               </li>
               <li style={{ marginBottom: '0.75rem' }}>
-                <a href="/roadmap" style={{ color: '#E0E0E0', textDecoration: 'none' }}>🗺️ 13-Week Roadmap</a>
+                <a href="/physical-ai-humanoid-robotics-textbook/roadmap" style={{ color: '#E0E0E0', textDecoration: 'none' }}>🗺️ 13-Week Roadmap</a>
               </li>
               <li style={{ marginBottom: '0.75rem' }}>
-                <a href="/profile" style={{ color: '#E0E0E0', textDecoration: 'none' }}>🖥️ Dashboard</a>
+                <a href="/physical-ai-humanoid-robotics-textbook/profile" style={{ color: '#E0E0E0', textDecoration: 'none' }}>🖥️ Dashboard</a>
               </li>
               <li style={{ marginBottom: '0.75rem' }}>
-                <a href="/admin/ingest" style={{ color: '#E0E0E0', textDecoration: 'none' }}>🛡️ Admin</a>
+                <a href="/physical-ai-humanoid-robotics-textbook/admin/ingest" style={{ color: '#E0E0E0', textDecoration: 'none' }}>🛡️ Admin</a>
               </li>
             </ul>
           </div>

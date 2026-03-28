@@ -135,7 +135,7 @@ export default function DocItem(props: any) {
 
         {/* Hardware profile indicator */}
         {personalizationEnabled && hardwareProfile && (
-          <HardwareIndicator compact onEdit={() => { window.location.href = '/profile'; }} />
+          <HardwareIndicator compact onEdit={() => { window.location.href = '/physical-ai-humanoid-robotics-textbook/profile'; }} />
         )}
 
         {/* Personalized summary */}

@@ -38,8 +38,8 @@ class IngestionLog(Base):
 
     __tablename__ = "ingestion_logs"
 
-    id = Column(GUID, primary_key=True, default=uuid.uuid4)
-    user_id = Column(GUID, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    id = Column(GUID(), primary_key=True, default=uuid.uuid4)
+    user_id = Column(GUID(), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     file_name = Column(String(500), nullable=False)
     file_path = Column(String(1000), nullable=False)
     file_size = Column(Integer, nullable=False)

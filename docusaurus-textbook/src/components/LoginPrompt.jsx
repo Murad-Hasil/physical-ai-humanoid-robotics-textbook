@@ -34,7 +34,7 @@ export default function LoginPrompt() {
 
             <div className="margin-top--xl">
               <a
-                href="/login"
+                href="/physical-ai-humanoid-robotics-textbook/login"
                 className="button button--primary button--lg margin-right--md"
                 style={{
                   background: 'rgba(0, 255, 255, 0.1)',
@@ -46,7 +46,7 @@ export default function LoginPrompt() {
                 Sign In
               </a>
               <a
-                href="/signup"
+                href="/physical-ai-humanoid-robotics-textbook/signup"
                 className="button button--outline button--lg"
                 style={{
                   border: '2px solid #00FFFF',

@@ -91,7 +91,7 @@ export default function Signup() {
         });
       }
 
-      window.location.href = '/profile';
+      window.location.href = '/physical-ai-humanoid-robotics-textbook/profile';
     } catch (err) {
       setError(err.message || 'Registration failed. Please try again.');
     } finally {
@@ -197,7 +197,7 @@ export default function Signup() {
                     <div className="text--center margin-top--lg">
                       <p style={{ color: '#aaa' }}>
                         Already have an account?{' '}
-                        <a href="/login" style={{ color: '#00F3FF' }}>Sign in</a>
+                        <a href="/physical-ai-humanoid-robotics-textbook/login" style={{ color: '#00F3FF' }}>Sign in</a>
                       </p>
                     </div>
                   </form>

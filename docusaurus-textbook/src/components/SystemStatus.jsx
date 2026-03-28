@@ -28,7 +28,7 @@ export default function SystemStatus() {
           <>
             Mode: {displayString}
             {!hardwareProfile && (
-              <a href="/profile" className="system-status__link margin-left--xs">
+              <a href="/physical-ai-humanoid-robotics-textbook/profile" className="system-status__link margin-left--xs">
                 (Configure)
               </a>
             )}
