@@ -61,3 +61,11 @@ htmlcov/
 # Misc
 *.tmp
 *.temp
+
+# Screenshots, debug images and PDFs (root level only)
+/*.png
+/*.jpg
+/*.jpeg
+/*.pdf
+/.playwright-mcp/
+/.mcp.json
