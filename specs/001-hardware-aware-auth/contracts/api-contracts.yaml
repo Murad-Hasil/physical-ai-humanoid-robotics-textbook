@@ -1,0 +1,979 @@
+# API Contracts: Hardware-Aware Authentication and Personalization
+
+**Created**: 2026-03-16
+**Feature**: 001-hardware-aware-auth
+**Purpose**: Define API endpoints, request/response schemas, and error codes for student authentication, hardware profiles, curriculum tracking, and hardware-aware chat
+
+---
+
+## OpenAPI Specification (Excerpt)
+
+```yaml
+openapi: 3.0.3
+info:
+  title: Physical AI Textbook - Auth & Personalization API
+  description: |
+    Authentication and personalization endpoints for the Physical AI textbook platform.
+    
+    **Authentication:**
+    - All authenticated endpoints require a valid session token
+    - Tokens are provided via secure HTTP-only cookies
+    - Frontend must include credentials: 'include' in fetch requests
+    
+    **Hardware-Aware Personalization:**
+    - Chat endpoint automatically injects hardware context from PDF "Hardware Reality" (Page 5)
+    - Edge Kit users receive inference-optimized advice (PDF Page 8)
+    - Sim Rig users receive workstation-optimized guidance
+    
+    **Rate Limiting:**
+    - Authentication endpoints: 10 requests per minute per IP
+    - Chat endpoints: 30 requests per minute per user
+    - Profile endpoints: 60 requests per minute per user
+    
+  version: 1.0.0
+  contact:
+    name: API Support
+
+servers:
+  - url: http://localhost:8000
+    description: Development server
+  - url: https://api.physical-ai-textbook.com
+    description: Production server
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: better-auth.session_token
+      description: Better-Auth session token cookie
+    
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token for API access
+
+  schemas:
+    # User Models
+    User:
+      type: object
+      required:
+        - id
+        - email
+        - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique user identifier
+        email:
+          type: string
+          format: email
+          description: Student's email address
+        email_verified:
+          type: boolean
+          description: Whether email is verified
+        github_id:
+          type: string
+          nullable: true
+          description: GitHub OAuth ID (if linked)
+        created_at:
+          type: string
+          format: date-time
+        last_login_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    StudentProfile:
+      type: object
+      required:
+        - id
+        - user_id
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        display_name:
+          type: string
+          minLength: 3
+          maxLength: 100
+          nullable: true
+        avatar_url:
+          type: string
+          format: uri
+          nullable: true
+        bio:
+          type: string
+          nullable: true
+        timezone:
+          type: string
+          default: UTC
+        total_weeks_completed:
+          type: integer
+          minimum: 0
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    HardwareConfig:
+      type: object
+      required:
+        - id
+        - student_profile_id
+        - hardware_type
+      properties:
+        id:
+          type: string
+          format: uuid
+        student_profile_id:
+          type: string
+          format: uuid
+        hardware_type:
+          type: string
+          enum: [sim_rig, edge_kit]
+          description: "Sim Rig (workstation) or Edge Kit (Jetson)"
+        gpu_model:
+          type: string
+          maxLength: 200
+          nullable: true
+          example: "RTX 4070 Ti"
+        gpu_vram_gb:
+          type: integer
+          nullable: true
+          minimum: 12
+          example: 12
+        ubuntu_version:
+          type: string
+          nullable: true
+          example: "22.04"
+        edge_kit_type:
+          type: string
+          nullable: true
+          enum: [Jetson Orin Nano, Jetson Orin NX, Jetson AGX Orin]
+          example: "Jetson Orin Nano"
+        jetpack_version:
+          type: string
+          nullable: true
+          example: "5.1"
+        robot_model:
+          type: string
+          nullable: true
+          enum: [Unitree Go2, Unitree G1, Proxy]
+          example: "Unitree Go2"
+        sensor_model:
+          type: string
+          nullable: true
+          example: "RealSense D435i"
+        additional_specs:
+          type: object
+          additionalProperties: true
+          nullable: true
+          description: Flexible JSON field for other specs
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    CurriculumProgress:
+      type: object
+      required:
+        - id
+        - student_profile_id
+        - week_number
+        - module_id
+        - completed_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        student_profile_id:
+          type: string
+          format: uuid
+        week_number:
+          type: integer
+          minimum: 1
+          maximum: 13
+          example: 5
+        module_id:
+          type: string
+          pattern: "^\\d{2}-[a-z0-9-]+$"
+          example: "02-gazebo"
+        completed_at:
+          type: string
+          format: date-time
+        score_percentage:
+          type: integer
+          minimum: 0
+          maximum: 100
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+
+    ChatSession:
+      type: object
+      required:
+        - id
+        - user_id
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        title:
+          type: string
+          maxLength: 200
+          nullable: true
+        hardware_context_injected:
+          type: boolean
+          description: Whether hardware profile was injected
+        hardware_type_at_session:
+          type: string
+          enum: [sim_rig, edge_kit]
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        message_count:
+          type: integer
+          minimum: 0
+
+    ChatMessage:
+      type: object
+      required:
+        - id
+        - chat_session_id
+        - role
+        - content
+        - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        chat_session_id:
+          type: string
+          format: uuid
+        role:
+          type: string
+          enum: [user, assistant, system]
+        content:
+          type: string
+        selected_text:
+          type: string
+          nullable: true
+        hardware_profile_snapshot:
+          type: object
+          nullable: true
+          description: Hardware context at time of message
+        pdf_page_references:
+          type: array
+          items:
+            type: integer
+          nullable: true
+          description: PDF pages referenced (e.g., [5, 8])
+        sources:
+          type: array
+          items:
+            type: object
+            properties:
+              module:
+                type: string
+              week:
+                type: string
+              page_title:
+                type: string
+              file_path:
+                type: string
+              similarity_score:
+                type: number
+                minimum: 0
+                maximum: 1
+        confidence_score:
+          type: number
+          minimum: 0
+          maximum: 1
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        tokens_used:
+          type: integer
+          nullable: true
+
+    # Request/Response Models
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+
+    LoginResponse:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
+        session_token:
+          type: string
+          description: Session token (also set as HTTP-only cookie)
+
+    RegisterRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+
+    HardwareConfigRequest:
+      type: object
+      required:
+        - hardware_type
+      properties:
+        hardware_type:
+          type: string
+          enum: [sim_rig, edge_kit]
+        gpu_model:
+          type: string
+          maxLength: 200
+        gpu_vram_gb:
+          type: integer
+          minimum: 12
+        ubuntu_version:
+          type: string
+        edge_kit_type:
+          type: string
+          enum: [Jetson Orin Nano, Jetson Orin NX, Jetson AGX Orin]
+        jetpack_version:
+          type: string
+        robot_model:
+          type: string
+          enum: [Unitree Go2, Unitree G1, Proxy]
+        sensor_model:
+          type: string
+        additional_specs:
+          type: object
+          additionalProperties: true
+
+    CurriculumProgressRequest:
+      type: object
+      required:
+        - week_number
+        - module_id
+      properties:
+        week_number:
+          type: integer
+          minimum: 1
+          maximum: 13
+        module_id:
+          type: string
+          pattern: "^\\d{2}-[a-z0-9-]+$"
+        score_percentage:
+          type: integer
+          minimum: 0
+          maximum: 100
+        notes:
+          type: string
+
+    ChatQueryRequest:
+      type: object
+      required:
+        - query
+      properties:
+        query:
+          type: string
+          minLength: 1
+          maxLength: 2000
+        selected_text:
+          type: string
+          minLength: 10
+          maxLength: 5000
+          nullable: true
+        session_id:
+          type: string
+          format: uuid
+          nullable: true
+
+    ChatQueryResponse:
+      type: object
+      properties:
+        response:
+          type: string
+        sources:
+          type: array
+          items:
+            type: object
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+        session_id:
+          type: string
+          format: uuid
+        hardware_context_used:
+          type: boolean
+          description: Whether hardware profile was injected
+        hardware_type_applied:
+          type: string
+          enum: [sim_rig, edge_kit]
+          nullable: true
+          description: Hardware type that was applied
+        pdf_pages_referenced:
+          type: array
+          items:
+            type: integer
+          nullable: true
+          description: PDF pages referenced in response (e.g., [5, 8])
+
+    Error:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          additionalProperties: true
+          nullable: true
+
+  responses:
+    UnauthorizedError:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "unauthorized"
+            message: "Authentication required. Please log in."
+
+    ForbiddenError:
+      description: Insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "forbidden"
+            message: "You do not have permission to access this resource."
+
+    NotFoundError:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "not_found"
+            message: "The requested resource was not found."
+
+    ValidationError:
+      description: Invalid request data
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "validation_error"
+            message: "Request validation failed"
+            details:
+              - field: "email"
+                message: "Invalid email format"
+
+paths:
+  /api/auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register new student
+      description: Create a new student account with email and password
+      operationId: registerStudent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Student registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '409':
+          description: Email already registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: "conflict"
+                message: "An account with this email already exists"
+
+  /api/auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Login student
+      description: Authenticate student with email and password
+      operationId: loginStudent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: "invalid_credentials"
+                message: "Invalid email or password"
+        '429':
+          description: Too many login attempts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: "rate_limited"
+                message: "Too many login attempts. Please try again later."
+
+  /api/auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Logout student
+      description: Invalidate current session
+      operationId: logoutStudent
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Logout successful
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /api/auth/github:
+    get:
+      tags:
+        - Authentication
+      summary: GitHub OAuth login
+      description: Initiate GitHub OAuth authentication flow
+      operationId: loginWithGithub
+      responses:
+        '302':
+          description: Redirect to GitHub OAuth
+
+  /api/auth/github/callback:
+    get:
+      tags:
+        - Authentication
+      summary: GitHub OAuth callback
+      description: Handle GitHub OAuth callback
+      operationId: githubCallback
+      parameters:
+        - name: code
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Redirect to app with session token
+        '400':
+          description: OAuth error
+
+  /api/auth/me:
+    get:
+      tags:
+        - Authentication
+      summary: Get current student
+      description: Retrieve authenticated student information
+      operationId: getCurrentStudent
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Student information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /api/student/profile:
+    get:
+      tags:
+        - Student Profile
+      summary: Get student profile
+      description: Retrieve current student's profile
+      operationId: getStudentProfile
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Student profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentProfile'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+    put:
+      tags:
+        - Student Profile
+      summary: Update student profile
+      description: Update current student's profile information
+      operationId: updateStudentProfile
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                display_name:
+                  type: string
+                bio:
+                  type: string
+                timezone:
+                  type: string
+      responses:
+        '200':
+          description: Profile updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentProfile'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /api/student/hardware-config:
+    get:
+      tags:
+        - Hardware Configuration
+      summary: Get hardware config
+      description: Retrieve current student's hardware configuration (PDF Page 5)
+      operationId: getHardwareConfig
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Hardware config
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HardwareConfig'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: No hardware config set
+
+    put:
+      tags:
+        - Hardware Configuration
+      summary: Update hardware config
+      description: Create or update current student's hardware config from PDF options
+      operationId: updateHardwareConfig
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HardwareConfigRequest'
+      responses:
+        '200':
+          description: Config updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HardwareConfig'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /api/student/curriculum-progress:
+    get:
+      tags:
+        - Curriculum Progress
+      summary: Get curriculum progress
+      description: Retrieve current student's progress (Weeks 1-13)
+      operationId: getCurriculumProgress
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Progress list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CurriculumProgress'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+    post:
+      tags:
+        - Curriculum Progress
+      summary: Record curriculum progress
+      description: Mark a week/module as completed
+      operationId: recordCurriculumProgress
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CurriculumProgressRequest'
+      responses:
+        '201':
+          description: Progress recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurriculumProgress'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '409':
+          description: Progress already recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/student/chat-history:
+    get:
+      tags:
+        - Chat History
+      summary: Get chat history
+      description: Retrieve current student's chat sessions with pagination
+      operationId: getChatHistory
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+          description: Page number
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+          description: Items per page
+      responses:
+        '200':
+          description: Chat sessions list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ChatSession'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /api/student/chat-history/{session_id}:
+    get:
+      tags:
+        - Chat History
+      summary: Get chat session messages
+      description: Retrieve messages from a specific chat session
+      operationId: getChatSessionMessages
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Chat messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ChatMessage'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /api/chat:
+    post:
+      tags:
+        - Chat
+      summary: Chat with hardware-aware personalization
+      description: |
+        Chat endpoint with hardware-aware personalization.
+        
+        **Personalization Behavior:**
+        - If student has hardware config, context is automatically injected
+        - PDF Page 5 "Hardware Reality" constraints are applied
+        - Edge Kit users receive inference-optimized advice (PDF Page 8)
+        - Sim Rig users receive workstation-optimized guidance
+        - Hardware context appears in response as `hardware_context_used: true`
+        - Student can override by explicitly mentioning different hardware in query
+      operationId: chatWithPersonalization
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatQueryRequest'
+      responses:
+        '200':
+          description: Chat response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatQueryResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '408':
+          description: Request timeout
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: "timeout"
+                message: "Request timed out. Please try again."
+        '503':
+          description: Service unavailable
+
+```
+
+---
+
+## Error Code Taxonomy
+
+| Error Code | HTTP Status | Description | User Action |
+|------------|-------------|-------------|-------------|
+| `unauthorized` | 401 | Authentication required | Log in to continue |
+| `invalid_credentials` | 401 | Wrong email/password | Check credentials and retry |
+| `session_expired` | 401 | Session token expired | Log in again |
+| `forbidden` | 403 | Insufficient permissions | Contact support if this seems wrong |
+| `not_found` | 404 | Resource doesn't exist | Check URL or contact support |
+| `conflict` | 409 | Resource already exists (e.g., email registered) | Use different email or log in |
+| `validation_error` | 400 | Invalid request data | Fix validation errors and retry |
+| `rate_limited` | 429 | Too many requests | Wait and retry later |
+| `timeout` | 408 | Request timed out | Retry or simplify query |
+| `service_unavailable` | 503 | Backend service down | Try again later |
+| `invalid_hardware_config` | 400 | Hardware config doesn't match PDF options | Select from valid PDF-specified hardware |
+| `invalid_week_number` | 400 | Week number must be 1-13 | Use valid week number from curriculum |
+
+---
+
+## Rate Limiting
+
+| Endpoint | Limit | Window | Scope |
+|----------|-------|--------|-------|
+| `/api/auth/*` | 10 requests | 1 minute | Per IP |
+| `/api/chat` | 30 requests | 1 minute | Per user |
+| `/api/student/*` | 60 requests | 1 minute | Per user |
+
+**Headers returned on rate limit:**
+```
+X-RateLimit-Limit: 30
+X-RateLimit-Remaining: 0
+X-RateLimit-Reset: 1647389400
+Retry-After: 60
+```
+
+---
+
+## Security Considerations
+
+1. **Authentication**: All student-specific endpoints require valid session tokens
+2. **Authorization**: Students can only access their own profiles and data
+3. **Input Validation**: All request bodies validated against schemas (including PDF hardware enums)
+4. **SQL Injection Prevention**: ORM parameterization prevents injection
+5. **XSS Prevention**: Response content properly escaped
+6. **CSRF Protection**: State-changing operations require CSRF tokens
+7. **Rate Limiting**: Prevents brute force and DoS attacks
+8. **Audit Logging**: All authentication events logged
+9. **Hardware Config Validation**: Ensures PDF-specified values only

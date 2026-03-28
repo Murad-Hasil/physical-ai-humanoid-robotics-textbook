@@ -1,0 +1,121 @@
+/**
+ * Tailwind CSS directives for Docusaurus
+ * This file imports Tailwind's base, components, and utilities
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 
+ * Custom component classes using Tailwind utilities
+ * These complement the custom.css glassmorphism/neon effects
+ */
+
+@layer components {
+  /* Glass card with Tailwind utilities */
+  .tw-glass-card {
+    @apply bg-white/10 dark:bg-black/20 backdrop-blur-md border border-white/20 dark:border-white/10 rounded-2xl shadow-lg transition-all duration-300;
+  }
+  
+  .tw-glass-card:hover {
+    @apply bg-white/15 dark:bg-black/30 -translate-y-0.5;
+  }
+  
+  /* Neon button with Tailwind */
+  .tw-neon-btn {
+    @apply bg-transparent text-neon-blue border-2 border-neon-blue px-6 py-3 rounded-lg font-semibold uppercase tracking-wider cursor-pointer transition-all duration-300 shadow-neon-blue-sm hover:bg-neon-blue hover:text-black hover:shadow-neon-blue hover:-translate-y-0.5;
+  }
+  
+  /* Electric button with Tailwind */
+  .tw-electric-btn {
+    @apply bg-transparent text-electric-blue border-2 border-electric-blue px-6 py-3 rounded-lg font-semibold cursor-pointer transition-all duration-300 shadow-electric-blue hover:bg-electric-blue hover:text-white hover:shadow-electric-blue hover:-translate-y-0.5;
+  }
+  
+  /* Glass navigation bar */
+  .tw-glass-nav {
+    @apply bg-white/8 dark:bg-black/25 backdrop-blur-md border-b border-white/15 dark:border-white/8;
+  }
+  
+  /* Neon text glow */
+  .tw-neon-text {
+    @apply text-neon-blue;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5), 0 0 20px rgba(0, 255, 255, 0.3);
+  }
+  
+  /* Gradient text */
+  .tw-gradient-text {
+    @apply bg-gradient-to-r from-neon-blue via-electric-blue to-neon-blue bg-clip-text text-transparent bg-[length:200%_auto];
+    animation: gradient-shift 3s linear infinite;
+  }
+  
+  @keyframes gradient-shift {
+    0% {
+      background-position: 0% center;
+    }
+    100% {
+      background-position: 200% center;
+    }
+  }
+  
+  /* Glass panel section */
+  .tw-glass-panel {
+    @apply bg-gradient-to-br from-white/10 to-white/5 dark:from-black/30 dark:to-black/15 backdrop-blur-md border border-white/18 dark:border-white/10 rounded-xl p-6;
+  }
+  
+  /* Neon border container */
+  .tw-neon-border {
+    @apply border-2 border-neon-blue rounded-xl shadow-neon-blue-sm transition-all duration-300;
+  }
+  
+  .tw-neon-border:hover {
+    @apply shadow-neon-blue;
+  }
+  
+  /* Electric border container */
+  .tw-electric-border {
+    @apply border-2 border-electric-blue rounded-xl;
+    box-shadow: 0 0 10px rgba(0, 128, 255, 0.3), inset 0 0 10px rgba(0, 128, 255, 0.1);
+  }
+}
+
+@layer utilities {
+  /* Utility for neon glow on any element */
+  .glow-neon {
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.5), 0 0 20px rgba(0, 255, 255, 0.3), 0 0 30px rgba(0, 255, 255, 0.2);
+  }
+  
+  .glow-electric {
+    box-shadow: 0 0 10px rgba(0, 128, 255, 0.5), 0 0 20px rgba(0, 128, 255, 0.3);
+  }
+  
+  /* Animation utilities */
+  .animate-neon-pulse {
+    animation: neon-pulse 2s ease-in-out infinite;
+  }
+  
+  @keyframes neon-pulse {
+    0%, 100% {
+      box-shadow: 0 0 10px rgba(0, 255, 255, 0.5), 0 0 20px rgba(0, 255, 255, 0.3), 0 0 30px rgba(0, 255, 255, 0.2);
+    }
+    50% {
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.8), 0 0 40px rgba(0, 255, 255, 0.5), 0 0 60px rgba(0, 255, 255, 0.3);
+    }
+  }
+  
+  .animate-glass-shimmer {
+    animation: glass-shimmer 3s ease-in-out infinite;
+  }
+  
+  @keyframes glass-shimmer {
+    0% {
+      background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0.1) 100%);
+    }
+    50% {
+      background: linear-gradient(45deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.15) 100%);
+    }
+    100% {
+      background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0.1) 100%);
+    }
+  }
+}

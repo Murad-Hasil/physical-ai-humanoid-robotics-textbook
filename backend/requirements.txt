@@ -1,0 +1,48 @@
+# FastAPI and ASGI server
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+
+# LangChain for RAG pipeline
+langchain>=0.1.0
+langchain-community>=0.0.10
+
+# Vector database
+qdrant-client>=1.7.1
+
+# Embeddings
+sentence-transformers>=2.3.1
+fastembed>=0.7.4  # Lightweight embeddings for RAG
+
+# PDF Processing
+pdfplumber>=0.11.9  # PDF text extraction
+
+# HTTP client for Grok API
+httpx>=0.26.0
+
+# Data validation
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+
+# Environment variables
+python-dotenv>=1.0.0
+
+# Testing
+pytest>=8.0.0
+pytest-asyncio>=0.23.3
+pytest-cov>=4.1.0
+
+# Utilities
+python-multipart>=0.0.6
+
+# Authentication (Phase 3 - Auth & Personalization)
+# Note: Better-Auth is primarily JS/TS - for Python we use JWT + session management
+PyJWT>=2.8.0
+sqlalchemy>=2.0.0
+alembic>=1.13.0
+bcrypt>=4.1.0
+python-jose[cryptography]>=3.3.0
+passlib>=1.7.4
+email-validator>=2.1.0  # For email validation
+
+# Database
+psycopg2-binary>=2.9.9  # PostgreSQL adapter

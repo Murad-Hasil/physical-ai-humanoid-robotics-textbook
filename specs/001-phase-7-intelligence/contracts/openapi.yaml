@@ -1,0 +1,817 @@
+openapi: 3.0.3
+info:
+  title: Physical AI Curriculum API - Phase 7 Final Intelligence
+  description: |
+    API for adaptive content personalization and multi-language support.
+    
+    ## Features
+    - User profile management with hardware configuration and skill level
+    - Personalized chapter summaries based on hardware profile and skill level
+    - Roman Urdu translation toggle for chapter content
+    - Complete 13-week curriculum access
+    
+    ## Authentication
+    All endpoints require JWT Bearer token except where noted.
+    
+    ## Hardware Profiles
+    - `sim_rig`: Desktop setup with RTX 4070 Ti or better
+    - `edge_kit`: Jetson Orin Nano/NX or AGX Orin
+    - `unitree`: Unitree Go2, G1, or Proxy robots
+    
+    ## Skill Levels
+    - `beginner`: Foundational concepts, simple language
+    - `intermediate`: Technical details, assumes basic knowledge
+    - `advanced`: Deep optimization, production considerations
+  version: 1.0.0
+  contact:
+    name: Physical AI Team
+
+servers:
+  - url: https://api.physicalai.example.com/api/v1
+    description: Production server
+  - url: http://localhost:8000/api/v1
+    description: Local development server
+
+tags:
+  - name: User Profiles
+    description: User profile and hardware configuration management
+  - name: Personalization
+    description: Hardware-aware content personalization
+  - name: Translations
+    description: Roman Urdu translation management
+  - name: Curriculum
+    description: 13-week curriculum content access
+
+paths:
+  /user-profile:
+    get:
+      tags:
+        - User Profiles
+      summary: Get user profile with hardware config
+      description: Retrieve complete user profile including skill level and hardware configuration
+      operationId: getUserProfile
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfileResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Profile not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    put:
+      tags:
+        - User Profiles
+      summary: Update user profile
+      description: Update skill level and profile information
+      operationId: updateUserProfile
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentProfileUpdate'
+      responses:
+        '200':
+          description: Successful update
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfileResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /user-profile/hardware-config:
+    put:
+      tags:
+        - User Profiles
+      summary: Update hardware configuration
+      description: Set or update user's hardware profile
+      operationId: updateHardwareConfig
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HardwareConfigCreate'
+      responses:
+        '200':
+          description: Successful update
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HardwareConfigResponse'
+        '400':
+          description: Invalid hardware configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /chapters/{chapter_id}/summary:
+    get:
+      tags:
+        - Personalization
+      summary: Get personalized chapter summary
+      description: |
+        Retrieve chapter summary personalized for the user's hardware profile and skill level.
+        
+        If no query parameters provided, uses current user's profile.
+        Admins can request summaries for specific hardware/skill combinations.
+      operationId: getChapterSummary
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: chapter_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: hardware_profile
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [sim_rig, edge_kit, unitree]
+          description: Override hardware profile (admin only)
+        - name: skill_level
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [beginner, intermediate, advanced]
+          description: Override skill level (admin only)
+      responses:
+        '200':
+          description: Personalized summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChapterSummaryResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Chapter not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /personalization/regenerate:
+    post:
+      tags:
+        - Personalization
+      summary: Regenerate all summaries
+      description: |
+        Regenerate personalized summaries for all chapters.
+        
+        **Admin only**. Useful after content updates or prompt improvements.
+      operationId: regenerateSummaries
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                hardware_profile:
+                  type: string
+                  enum: [sim_rig, edge_kit, unitree]
+                skill_level:
+                  type: string
+                  enum: [beginner, intermediate, advanced]
+              description: Filter by specific combination (optional)
+      responses:
+        '202':
+          description: Regeneration started (background job)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobStatusResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Admin access required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /chapters/{chapter_id}/translation:
+    get:
+      tags:
+        - Translations
+      summary: Get chapter translation
+      description: |
+        Retrieve Roman Urdu translation of chapter content.
+        
+        Returns 404 if translation not available (show English with indicator per spec).
+      operationId: getChapterTranslation
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: chapter_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: lang
+          in: query
+          required: true
+          schema:
+            type: string
+            example: ur-Latn
+          description: Language code (ur-Latn for Roman Urdu)
+      responses:
+        '200':
+          description: Translation found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TranslationResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Translation not available
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    put:
+      tags:
+        - Translations
+      summary: Update translation
+      description: |
+        Update or create translation for a chapter.
+        
+        **Admin only**. Used for manual translation updates or AI translation review.
+      operationId: updateTranslation
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: chapter_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TranslationUpdate'
+      responses:
+        '200':
+          description: Successful update
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TranslationResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Admin access required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /translations/status:
+    get:
+      tags:
+        - Translations
+      summary: Get translation coverage stats
+      description: |
+        Retrieve translation progress statistics.
+        
+        Shows how many chapters have been translated to Roman Urdu.
+      operationId: getTranslationStatus
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Translation statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TranslationStatsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /curriculum/weeks:
+    get:
+      tags:
+        - Curriculum
+      summary: List all curriculum weeks
+      description: Retrieve overview of all 13 weeks
+      operationId: listCurriculumWeeks
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: include_chapters
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: Include chapter list in response
+      responses:
+        '200':
+          description: List of weeks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CurriculumWeekResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /curriculum/weeks/{week_number}:
+    get:
+      tags:
+        - Curriculum
+      summary: Get week details with chapters
+      description: Retrieve complete week content including all chapters
+      operationId: getCurriculumWeek
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: week_number
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 13
+        - name: include_personalized_summaries
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: true
+          description: Include personalized summaries for user's profile
+      responses:
+        '200':
+          description: Week details with chapters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurriculumWeekDetailResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Week not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /curriculum/ingest:
+    post:
+      tags:
+        - Curriculum
+      summary: Batch ingest curriculum content
+      description: |
+        Ingest markdown files for multiple weeks/chapters.
+        
+        **Admin only**. Used for initial content population or bulk updates.
+      operationId: ingestCurriculum
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CurriculumIngestRequest'
+      responses:
+        '202':
+          description: Ingestion started (background job)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobStatusResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Admin access required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token obtained from authentication endpoint
+
+  schemas:
+    # User Profile Schemas
+    UserProfileResponse:
+      type: object
+      properties:
+        user_id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        skill_level:
+          type: string
+          enum: [beginner, intermediate, advanced]
+        display_name:
+          type: string
+          nullable: true
+        hardware_config:
+          $ref: '#/components/schemas/HardwareConfigResponse'
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    
+    StudentProfileUpdate:
+      type: object
+      properties:
+        skill_level:
+          type: string
+          enum: [beginner, intermediate, advanced]
+        display_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        bio:
+          type: string
+          maxLength: 1000
+        timezone:
+          type: string
+          maxLength: 50
+    
+    HardwareConfigCreate:
+      type: object
+      required:
+        - hardware_type
+      properties:
+        hardware_type:
+          type: string
+          enum: [sim_rig, edge_kit, unitree]
+        gpu_model:
+          type: string
+          nullable: true
+        gpu_vram_gb:
+          type: integer
+          minimum: 1
+          maximum: 128
+          nullable: true
+        ubuntu_version:
+          type: string
+          nullable: true
+        edge_kit_type:
+          type: string
+          nullable: true
+        jetpack_version:
+          type: string
+          nullable: true
+        robot_model:
+          type: string
+          nullable: true
+        additional_specs:
+          type: object
+          additionalProperties: true
+    
+    HardwareConfigResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        hardware_type:
+          type: string
+          enum: [sim_rig, edge_kit, unitree]
+        gpu_model:
+          type: string
+          nullable: true
+        gpu_vram_gb:
+          type: integer
+          nullable: true
+        ubuntu_version:
+          type: string
+          nullable: true
+        edge_kit_type:
+          type: string
+          nullable: true
+        jetpack_version:
+          type: string
+          nullable: true
+        robot_model:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    
+    # Personalization Schemas
+    ChapterSummaryResponse:
+      type: object
+      properties:
+        chapter_id:
+          type: string
+          format: uuid
+        summary_content:
+          type: string
+          description: Markdown-formatted personalized summary
+        hardware_profile_type:
+          type: string
+          enum: [sim_rig, edge_kit, unitree]
+        skill_level:
+          type: string
+          enum: [beginner, intermediate, advanced]
+        generated_at:
+          type: string
+          format: date-time
+    
+    # Translation Schemas
+    TranslationResponse:
+      type: object
+      properties:
+        chapter_id:
+          type: string
+          format: uuid
+        translated_content:
+          type: string
+          description: Markdown-formatted Roman Urdu translation
+        language_code:
+          type: string
+          example: ur-Latn
+        status:
+          type: string
+          enum: [draft, in_review, published]
+        updated_at:
+          type: string
+          format: date-time
+    
+    TranslationUpdate:
+      type: object
+      required:
+        - language_code
+        - translated_content
+      properties:
+        language_code:
+          type: string
+          example: ur-Latn
+        translated_content:
+          type: string
+        status:
+          type: string
+          enum: [draft, in_review, published]
+          default: draft
+        review_notes:
+          type: string
+    
+    TranslationStatsResponse:
+      type: object
+      properties:
+        total_chapters:
+          type: integer
+        translated_chapters:
+          type: integer
+        published_chapters:
+          type: integer
+        draft_chapters:
+          type: integer
+        coverage_percentage:
+          type: number
+          format: float
+        by_language:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              published:
+                type: integer
+              draft:
+                type: integer
+              in_review:
+                type: integer
+    
+    # Curriculum Schemas
+    CurriculumWeekResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        week_number:
+          type: integer
+          minimum: 1
+          maximum: 13
+        title:
+          type: string
+        description:
+          type: string
+          nullable: true
+        estimated_hours:
+          type: integer
+          nullable: true
+        chapter_count:
+          type: integer
+    
+    CurriculumWeekDetailResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        week_number:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        estimated_hours:
+          type: integer
+        prerequisites:
+          type: array
+          items:
+            type: integer
+        chapters:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChapterResponse'
+    
+    ChapterResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        content:
+          type: string
+          description: Full markdown content
+        order:
+          type: integer
+        estimated_time:
+          type: string
+          nullable: true
+        tags:
+          type: array
+          items:
+            type: string
+        personalized_summary:
+          $ref: '#/components/schemas/ChapterSummaryResponse'
+          nullable: true
+          description: Included if include_personalized_summaries=true
+        translation_available:
+          type: boolean
+          description: Whether Roman Urdu translation exists
+    
+    CurriculumIngestRequest:
+      type: object
+      required:
+        - weeks
+      properties:
+        weeks:
+          type: array
+          items:
+            $ref: '#/components/schemas/CurriculumWeekIngest'
+        regenerate_summaries:
+          type: boolean
+          default: false
+          description: Whether to regenerate summaries after ingestion
+    
+    CurriculumWeekIngest:
+      type: object
+      required:
+        - week_number
+        - title
+        - chapters
+      properties:
+        week_number:
+          type: integer
+          minimum: 1
+          maximum: 13
+        title:
+          type: string
+        description:
+          type: string
+        estimated_hours:
+          type: integer
+        chapters:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChapterIngest'
+    
+    ChapterIngest:
+      type: object
+      required:
+        - title
+        - content
+        - order
+      properties:
+        title:
+          type: string
+        content:
+          type: string
+        order:
+          type: integer
+          minimum: 1
+        estimated_time:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+    
+    # Common Schemas
+    JobStatusResponse:
+      type: object
+      properties:
+        job_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [pending, running, completed, failed]
+        message:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+    
+    Error:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          additionalProperties: true
+          description: Additional error details (validation errors, etc.)
+
+  responses:
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "unauthorized"
+            message: "Authentication required"

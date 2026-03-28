@@ -1,0 +1,9 @@
+{
+  "label": "Module 3: NVIDIA Isaac Platform",
+  "position": 4,
+  "link": {
+    "type": "generated-index",
+    "title": "NVIDIA Isaac Platform",
+    "description": "Leverage NVIDIA Isaac Sim, Isaac Lab, and GPU-accelerated robotics simulation for humanoid development"
+  }
+}
